@@ -9,7 +9,7 @@ from db import models
 from exceptions import StoryException
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 app.include_router(authentication.router)
@@ -48,3 +48,5 @@ app.add_middleware(
   allow_methods = ["*"],
   allow_headers = ['*']
 )
+
+app.mount("/files",StaticFiles(directory="files"),name="files")
