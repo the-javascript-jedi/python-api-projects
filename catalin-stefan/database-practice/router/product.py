@@ -2,6 +2,7 @@ from typing import Optional, List
 from fastapi import APIRouter, Header, Cookie, Form
 from fastapi.responses import Response, HTMLResponse, PlainTextResponse
 from custom_log import log
+import time
 
 router = APIRouter(
   prefix='/product',
@@ -10,9 +11,15 @@ router = APIRouter(
 
 products = ['watch', 'camera', 'phone']
 
+async def time_consuming_functionality():
+  time.sleep(5)
+  return 'ok'
 
 @router.get('/all')
-def get_all_products():
+async def get_all_products():
+  # simulate a time consuming functionality
+  #  since we add await keyword the resource is not consumed and it will carry on working
+  await time_consuming_functionality()
   # custom logger
   log("myAPI","Call to get all products")
   # return products
