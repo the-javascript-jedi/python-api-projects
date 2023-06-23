@@ -1,6 +1,7 @@
 from typing import Optional, List
 from fastapi import APIRouter, Header, Cookie, Form
 from fastapi.responses import Response, HTMLResponse, PlainTextResponse
+from custom_log import log
 
 router = APIRouter(
   prefix='/product',
@@ -12,13 +13,17 @@ products = ['watch', 'camera', 'phone']
 
 @router.get('/all')
 def get_all_products():
+  # custom logger
+  log("myAPI","Call to get all products")
   # return products
   data = " ".join(products)
   return Response(content=data, media_type="text/plain")
 
 @router.get("/withheader")
 def get_products(response:Response,custom_header:Optional[str]=Header(None)):
-    return products
+  # custom logger
+  log("myAPI", "Call to get all products withheader")
+  return products
 
 @router.get("/withheaderList")
 def get_products(response:Response,custom_header:Optional[List[str]]=Header(None)):
