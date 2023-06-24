@@ -1,1 +1,7 @@
 MyApi: Template read for product with id aaa
+MyApp: 
+	http://127.0.0.1:8081/dependencies?test=test&separator=%25%25%25&tag=MyApp
+MyApp: no_message
+	http://127.0.0.1:8081/dependencies?test=test&separator=%25%25%25&tag=MyApp
+MyApp taf: hi everybody
+	http://127.0.0.1:8081/dependencies/new?tag=MyApp%20taf&message=hi%20everybody&separator=chelsea

@@ -1,10 +1,13 @@
 from fastapi.requests import Request
 from fastapi.param_functions import Depends
 from fastapi import APIRouter
-
+from custom_log import log
+# when we add a method to the dependencies array, all apis will be injected with the dependency
+#  we need to specify default params to the injected dependency
 router=APIRouter(
     prefix="/dependencies",
-    tags=["dependencies"]
+    tags=["dependencies"],
+    dependencies=[Depends(log)]
 )
 # Multi Level Dependencies
 def convert_params(request:Request,separator:str):
