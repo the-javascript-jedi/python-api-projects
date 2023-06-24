@@ -26,3 +26,17 @@ def create_item(headers=Depends(convert_headers)):
         'result':'new item created',
         'headers':headers
     }
+
+# define a class and inject the class as a dependency
+class Account:
+    def __init__(self,name:str,email:str):
+        self.name=name
+        self.email=email
+
+@router.post('/user')
+def create_user(name:str,email:str,password:str,account:Account=Depends(Account)):
+    #account - perform whatever operations
+    return{
+        'name':account.name,
+        'email':account.email
+    }
