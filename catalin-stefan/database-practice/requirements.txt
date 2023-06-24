@@ -10,3 +10,4 @@ requests
 pytest
 httpx
 jinja2
+websockets
