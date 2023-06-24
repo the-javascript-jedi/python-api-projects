@@ -9,3 +9,4 @@ aiofiles
 requests
 pytest
 httpx
+jinja2
