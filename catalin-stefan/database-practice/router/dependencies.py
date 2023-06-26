@@ -2,6 +2,8 @@ from fastapi.requests import Request
 from fastapi.param_functions import Depends
 from fastapi import APIRouter
 from custom_log import log
+
+import pdb
 # when we add a method to the dependencies array, all apis will be injected with the dependency
 #  we need to specify default params to the injected dependency
 router=APIRouter(
@@ -29,6 +31,7 @@ def convert_headers(request:Request,separator:str="^^", query=Depends(convert_pa
 
 @router.get("")
 def get_items(test:str,separator:str='--',headers=Depends(convert_headers)):
+    # pdb.set_trace()
     return{
         'items':['a','b','c'],
         'headers':headers
