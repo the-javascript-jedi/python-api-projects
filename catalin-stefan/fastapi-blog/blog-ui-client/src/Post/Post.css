@@ -1,0 +1,37 @@
+.post{
+    display: flex;
+    width:50%;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: #fff;
+    max-width: 50%;
+    margin-bottom: 50px;
+}
+
+.post_image{
+    display: block;
+    width: 20%;
+    object-fit:contain;
+    padding-right: 10px;
+    margin-bottom: auto;    
+}
+
+.post_content{
+    display: block;
+}
+.post_title{
+    font-size: xx-large;
+}
+.post_text{
+    /* allows to save the white space */
+    white-space: pre-line;
+}
+.post_delete{
+    margin:10px;
+}
+.post_creator{
+    font-size: small;
+    font-style: italic;
+    margin:5px;
+    margin-left: 10px;
+}

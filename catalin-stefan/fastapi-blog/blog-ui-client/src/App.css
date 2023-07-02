@@ -1,0 +1,17 @@
+.blog_title{
+    display: flex;
+    width: 60%;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 60px;
+    justify-content: center;
+    padding: 20px;
+}
+
+.new_post{
+    display: flex;
+    width: 60%;
+    margin-left: auto;
+    margin-right: auto;
+    justify-content: center;    
+}
