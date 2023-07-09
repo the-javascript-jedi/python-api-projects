@@ -1,5 +1,7 @@
 # schemas for angular ui
 from pydantic import BaseModel
+from datetime import datetime
+
 
 class UserBase(BaseModel):
     username:str
@@ -11,3 +13,27 @@ class UserDisplay(BaseModel):
     email: str
     class Config():
         orm_mode=True
+
+class PostBase(BaseModel):
+    image_url:str
+    # image_url_type -  whether image is an uploaded image or an image path stored in google
+    image_url_type:str
+    caption:str
+    creator_id:int
+
+# class User is for Class PostDisplay
+class User(BaseModel):
+    username:str
+    class Config():
+        orm_mode = True
+
+
+class PostDisplay(BaseModel):
+    id:int
+    image_url:str
+    image_url_type:str
+    caption:str
+    timestamp:datetime
+    user:User #User is a custom class
+    class Config():
+        orm_mode = True
