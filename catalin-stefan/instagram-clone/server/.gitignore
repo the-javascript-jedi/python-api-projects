@@ -2,3 +2,4 @@
 ./fastapienv
 /fastapienv/Lib/site-packages/
 /ig_api.db
+/images
