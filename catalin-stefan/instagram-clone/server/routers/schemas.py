@@ -37,3 +37,8 @@ class PostDisplay(BaseModel):
     user:User #User is a custom class
     class Config():
         orm_mode = True
+
+class UserAuth(BaseModel):
+    id:int
+    username:str
+    email:str
