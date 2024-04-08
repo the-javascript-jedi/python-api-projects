@@ -1,16 +1,21 @@
-# This is a sample Python script.
+# run app - python main.py
+from flask import Flask
+# from flask_restful import Api, Resource
+from flask_restx import Api, Resource
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+app = Flask(__name__)
+api=Api(app)
 
+# using namespace
+ns = api.namespace('my_namespace', description='My operations')
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+@ns.route('/hello')
+class HelloWorld(Resource):
+    def get(self):
+        """Returns a simple Hello World message"""
+        return {'hello': 'world'}
+    def post(self):
+        return {"data":"Posted"}
 
-
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    app.run(debug=True)
