@@ -17,5 +17,10 @@ class HelloWorld(Resource):
     def post(self):
         return {"data":"Posted"}
 
+class HelloWorldTwo(Resource):
+    def get(self):
+        return {'hello': 'worldss two'}
+api.add_resource(HelloWorldTwo,'/helloTwo')
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0')
