@@ -7,6 +7,7 @@ Retrieve his stored sentence on our db for 1 token
 from flask import Flask, jsonify, request
 from flask_restful import Api, Resource
 import os
+import bcrypt
 
 from pymongo import MongoClient
 
@@ -16,6 +17,20 @@ api = Api(app)
 client = MongoClient("mongodb://db:27017")
 db = client.SentencesDatabase
 users = db["Users"]
+
+# Register API
+class Register(Resource):
+    def post(self):
+        # Step 1 is to get the posted data by the user
+        postedData=request.get_json()
+
+        #Got the data
+        username = postedData["username"]
+        password = postedData["password"]
+
+        hashed_pw=bcrypt.hashpw(password.encode('utf-8'),bcrypt.gensalt())
+
+        # store username and password in SentencesDatabase
 
 
 
