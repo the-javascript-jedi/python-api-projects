@@ -31,8 +31,88 @@ class Register(Resource):
         hashed_pw=bcrypt.hashpw(password.encode('utf-8'),bcrypt.gensalt())
 
         # store username and password in SentencesDatabase
+        users.insert_one({
+            "Username": username,
+            "Password": hashed_pw,
+            "Sentence":"",
+            "Tokens":6
+        })
+
+        retJson = {
+            "status":200,
+            "msg":"You have successfully signed up for the API"
+        }
+        return jsonify(retJson)
+
+def verifyPw(username,password):
+    # find the first username and return the password
+    hashed_pw=users.find({
+        "Username":username
+    })[0]["Password"]
+
+    if bcrypt.hashpw(password.encode('utf-8'),hashed_pw)==hashed_pw:
+        return True
+    else:
+        return False
+# return the no of tokens for the respective username
+# return the first searched username
+def countTokens(username):
+    tokens=users.find({
+        "Username":username
+    })[0]["Tokens"]
+    return tokens
 
 
+class Store(Resource):
+    def post(self):
+
+        #Step 1:get the posted data
+        postedData = request.get_json()
+        #Step 2: read the data from request
+        username = postedData["username"]
+        password = postedData["password"]
+        sentence = postedData["sentence"]
+
+        #Step 3: Verify the username and password match
+        correct_pw = verifyPw(username, password)
+        # incorrect response
+        if not correct_pw:
+            retJson={
+                "status":302
+            }
+            return jsonify(retJson)
+        #Step 4:Verify if the user has enough tokens
+        num_tokens=countTokens(username)
+        if num_tokens<=0:
+            retJson={
+                "status":301
+            }
+            return jsonify(retJson)
+
+        #Step 5: Store the sentence, take one token away and return 200
+        users.update_one({
+            "Username": username,
+        },{
+            "$set":{
+                "Sentence":sentence,
+                "Tokens":num_tokens-1
+            }
+        })
+        retJson = {
+            "status": 200,
+            "msg": "Sentence saved successfully"
+        }
+        return jsonify(retJson)
+
+api.add_resource(Register,'/register')
+api.add_resource(Store,'/store')
+
+# @app.route('/')
+# def hello():
+#     return "Hello, welcome to the API. Use /register or /store to interact."
+
+if __name__=="__main__":
+    app.run(debug=True, host='0.0.0.0')
 
 ##################################################################################################
 # from flask import Flask, jsonify, request
