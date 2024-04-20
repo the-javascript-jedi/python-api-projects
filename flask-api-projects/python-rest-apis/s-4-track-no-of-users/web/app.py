@@ -18,6 +18,8 @@ client = MongoClient("mongodb://db:27017")
 db = client.SentencesDatabase
 users = db["Users"]
 
+print("Starting application")
+print("__name__",__name__)
 # Register API
 class Register(Resource):
     def post(self):
@@ -45,7 +47,7 @@ class Register(Resource):
         return jsonify(retJson)
 
 def verifyPw(username,password):
-    # find the first username and return the password
+    # # find the user by username, get the first user and return the password
     hashed_pw=users.find({
         "Username":username
     })[0]["Password"]
@@ -68,6 +70,7 @@ class Store(Resource):
 
         #Step 1:get the posted data
         postedData = request.get_json()
+        print("postedData",postedData)
         #Step 2: read the data from request
         username = postedData["username"]
         password = postedData["password"]
@@ -104,15 +107,56 @@ class Store(Resource):
         }
         return jsonify(retJson)
 
+#get the sentence password
+class Get(Resource):
+    # POST request
+    def post(self):
+        postedData = request.get_json()
+        print("postedData",postedData)
+        #Step 2: read the data from request
+        username = postedData["username"]
+        password = postedData["password"]
+
+        #Step 3: Verify the username and password match
+        correct_pw = verifyPw(username, password)
+        print("correct_pw",correct_pw)
+        # incorrect response
+        if not correct_pw:
+            retJson={
+                "status":302
+            }
+            return jsonify(retJson)
+        #Step 4:Verify if the user has enough tokens
+        num_tokens=countTokens(username)
+        if num_tokens<=0:
+            retJson={
+                "status":301
+            }
+            return jsonify(retJson)
+        # find the user by username, get the first user
+        # and return the sentence
+        sentence = users.find({
+            "Username": username
+        })[0]["Sentence"]
+
+        retJson={
+            "status":200,
+            "sentence":sentence
+        }
+        return jsonify(retJson)
+
+
+# ADD API resources
 api.add_resource(Register,'/register')
 api.add_resource(Store,'/store')
+api.add_resource(Get,'/get')
 
 # @app.route('/')
 # def hello():
 #     return "Hello, welcome to the API. Use /register or /store to interact."
 
 if __name__=="__main__":
-    app.run(debug=True, host='0.0.0.0')
+    app.run(host='0.0.0.0', port=5000, debug=True)
 
 ##################################################################################################
 # from flask import Flask, jsonify, request

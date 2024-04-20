@@ -4,6 +4,7 @@ services:
     build: ./web
     ports:
       - "5000:5000"
+      - "5678:5678"
     depends_on:
       - db
     volumes:
