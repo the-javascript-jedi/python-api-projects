@@ -133,6 +133,15 @@ class Get(Resource):
                 "status":301
             }
             return jsonify(retJson)
+        # Make the users pay
+        users.update_one({
+            "Username":username
+        },{
+            "$set":{
+                "Tokens":num_tokens-1
+            }
+        })
+
         # find the user by username, get the first user
         # and return the sentence
         sentence = users.find({
