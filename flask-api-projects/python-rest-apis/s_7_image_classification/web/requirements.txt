@@ -1,0 +1,18 @@
+Flask
+flask_restful
+# driver for monodb
+pymongo 
+# for securely hashing passwords
+bcrypt
+# for debugging in docker
+debugpy
+# library for numerical operations
+numpy
+# library creating and training ml models
+tensorflow
+# app need to interact with services over http
+requests
+# high level interface for tensorflow
+keras
+# working with images so this library will make it easier for us
+pillow
