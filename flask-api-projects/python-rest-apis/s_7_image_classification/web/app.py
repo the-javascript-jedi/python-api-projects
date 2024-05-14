@@ -72,6 +72,40 @@ class Register(Resource):
             }
         return jsonify(ret_json)
     
+
+def verify_credentials(username,password):
+    if not user_exists(username):
+        return generate_return_dictionary(301,"Invalid Username"),True
+    
+    correct_pw=verify_pw(username,password)
+
+    if not correct_pw:
+        return generate_return_dictionary(302,"Invalid Password"),True
+    
+    # if nothing matches
+        return None,False
+    
+def verify_pw(username,password):
+    if not user_exists(username):
+        return False
+    hashed_pw=users.find({
+        "Username":username
+    })[0]["Password"]
+    
+    if bcrypt.hashpw(password.encode('utf8'),hashpw) == hashed_pw:
+        return True
+    else:
+        return False
+
+
+def generate_return_dictionary(status,msg):
+    ret_json={
+        "status":status,
+        "msg":msg
+    }
+    return ret_json
+
+
 class Classify(Resource):
     def post(self):
         # Get posted data
@@ -97,10 +131,41 @@ class Classify(Resource):
 
         # classify the image
         if not url:
-            return jsonify(({"error":"No url provided"}),400)       
+            return jsonify(({"error":"No url provided"}),400)  
+        # Load Image from URL
+        response = requests.get(url)
+        img = Image.open(BytesIO(response.content))
         
+        # Pre process the image for Inception V3 model
+        img = img.resize(299,299)
+        # convert to numpy array
+        img_array = img_to_array(img)
+        # set axis value of the model
+        img_array = np.expan_dims(img_array,axis=0)
+        # pre process the image
+        img_array = preprocess_input(img_array)
 
+        # Make Prediction
+        # We have the preprocessed image which we fed to the pre-trained inception model and the prediction is made and it is stored in this prediction object
+        prediction = pretrained_model.predict(img_array)
+        # so there might be a lot of probabilities on the image. So, if you pass an image of a ball, it might be like it's a ball, it's an apple, it looks resembles like pineapple, it's an orange, so there will be like a lot of thousand probabilities. And these probabilities correspond to those many number of classes in the ImageNet database. So for every probability, there is a class. So for example, if it's a dog, the probability is a dog, then there's a class representing the dog. And then these probabilities are decoded into human readable class labels using the decode prediction,
+        actual_prediction=imagenet_utils.decode_predictions(prediction,top=5)
+            
         # return classification response
+        ret_json = {}
+        for pred in actual_prediction[0]:
+            ret_json[pred[1]] = float(pred[2]*100)
+
+        # reduce token
+        users.update_one({
+            "Username":username
+        },{
+            "$set":{
+                "Tokens":tokens-1
+            }
+        })
+
+        return jsonify(ret_json)
 
 api.add_resource(Register,'/register')
 
