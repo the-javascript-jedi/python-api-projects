@@ -9,6 +9,8 @@ services:
       - db
     volumes:
       - ./web:/usr/src/app  # Mount local code directory into the container
+    environment:
+      - FLASK_ENV=development
+      - ENABLE_DEBUGPY=true
   db:
     build: ./db
-    

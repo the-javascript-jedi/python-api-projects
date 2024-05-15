@@ -4,6 +4,8 @@ from pymongo import MongoClient
 import bcrypt
 import numpy as np
 import requests
+import debugpy
+import os
 
 # import the InceptionV3 model from keras app model
 from keras.applications import InceptionV3
@@ -14,7 +16,7 @@ from keras.applications import imagenet_utils
 # it converts the PIL image, which is the Python image library image instance. So, the image that we have, we will be converting into PIL instance and it helps us convert this to a numpy array and which can be given as an input to the deep learning model
 from tensorflow.keras.preprocessing.image import img_to_array
 # this library provides us with the capability to working with images (resize,open etc)
-from PIL import image
+from PIL import Image
 # this class provides a file like object interface for raw byte data. And what we are going to do with this is We are going to convert the content of an image received from the Http response into a stream that can be used as an input to PIL's image class.
 from io import BytesIO
 
@@ -83,7 +85,7 @@ def verify_credentials(username,password):
         return generate_return_dictionary(302,"Invalid Password"),True
     
     # if nothing matches
-        return None,False
+    return None,False
     
 def verify_pw(username,password):
     if not user_exists(username):
@@ -92,7 +94,7 @@ def verify_pw(username,password):
         "Username":username
     })[0]["Password"]
     
-    if bcrypt.hashpw(password.encode('utf8'),hashpw) == hashed_pw:
+    if bcrypt.hashpw(password.encode('utf8'),hashed_pw) == hashed_pw:
         return True
     else:
         return False
@@ -137,11 +139,11 @@ class Classify(Resource):
         img = Image.open(BytesIO(response.content))
         
         # Pre process the image for Inception V3 model
-        img = img.resize(299,299)
+        img = img.resize((299,299))
         # convert to numpy array
         img_array = img_to_array(img)
         # set axis value of the model
-        img_array = np.expan_dims(img_array,axis=0)
+        img_array = np.expand_dims(img_array,axis=0)
         # pre process the image
         img_array = preprocess_input(img_array)
 
@@ -164,7 +166,7 @@ class Classify(Resource):
                 "Tokens":tokens-1
             }
         })
-
+        print("users",users)
         return jsonify(ret_json)
 
 class Refill(Resource):
@@ -200,5 +202,12 @@ api.add_resource(Register,'/register')
 api.add_resource(Classify,'/classify')
 api.add_resource(Refill,'/refill')
 
+# if __name__ == "__main__":
+#     app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=True)
+# if os.getenv("ENABLE_DEBUGPY", "false") == "true":
+#     debugpy.listen(('0.0.0.0', 5678))
+#     print("⏳ Waiting for debugger attach...")
+#     debugpy.wait_for_client()
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0")
+    app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=True)
