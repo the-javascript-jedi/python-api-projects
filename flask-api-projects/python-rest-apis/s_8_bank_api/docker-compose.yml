@@ -1,0 +1,16 @@
+version: '3'
+services:
+  web:
+    build: ./web
+    ports:
+      - "5000:5000"
+      - "5678:5678"
+    depends_on: # using depends_on instead of links
+      - db
+    volumes:
+      - ./web:/usr/src/app  # Mount local code directory into the container
+    environment:
+      - FLASK_ENV=development
+      - ENABLE_DEBUGPY=true
+  db:
+    build: ./db

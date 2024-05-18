@@ -1,0 +1,8 @@
+Flask
+flask_restful
+# driver for monodb
+pymongo 
+# for securely hashing passwords
+bcrypt
+# for debugging in docker
+debugpy
