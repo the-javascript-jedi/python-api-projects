@@ -112,8 +112,8 @@ class Add(Resource):
         postedData=request.get_json()
 
         username = postedData["username"]
-        password = postedData["password`"]
-        username = postedData["username"]
+        password = postedData["password"]
+        money = postedData["money"]
 
         retJson,error = verifyCredentials(username,password)
 
@@ -130,7 +130,87 @@ class Add(Resource):
         # add the transaction fee to bank
         updateAccount("BANK",bank_cash+1)
         updateAccount(username,cash+money)
-        return jsonify(generateReturnDictionary(200,"Amount added successfully to account"))
+        return jsonify(generateReturnDictionary(301,"Amount added successfully to account"))
+
+class Transfer(Resource):
+    def post(self):
+        postedData=request.get_json()
+
+        username = postedData["username"]
+        password = postedData["password"]
+        to = postedData["to"]
+        money = postedData["money"]
+
+        retJson,error = verifyCredentials(username,password)
+
+        if error:
+            return jsonify(retJson)
+        
+        cash = cashWithUser(username)
+        if cash<=0:
+            return jsonify(generateReturnDictionary(3004,"You are out of money please add or take a loan"))
+
+        if not UserExist(to):
+            return jsonify(generateReturnDictionary(301, "Receiver username is invalid"))
+        
+        # transaction fees
+        cash_from=cashWithUser(username)
+        cash_to=cashWithUser(to)
+        bank_cash=cashWithUser("BANK")
+
+        updateAccount("BANK",bank_cash+1)
+        updateAccount(to,cash_to+money-1)
+        # deduct money from user after transaction
+        updateAccount(username+cash_from-money)
+
+        return jsonify(generateReturnDictionary(200, "Amount Transferred succesfully"))
+    
+class Balance(Resource):
+    def post(self):
+        postedData=request.get_json()
+
+        username = postedData["username"]
+        password = postedData["password"]
+
+        retJson,error = verifyCredentials(username,password)
+
+        if error:
+            return jsonify(retJson)
+        
+        retJson = users.find({
+            "Username":username
+        },{
+            # add 0 to not send this values
+            "Password": 0,
+            "_id":0
+        })[0]
+
+        return jsonify(retJson)
+    
+class TakeLoan(Resource):
+    def post(self):
+        postedData=request.get_json()
+
+        username = postedData["username"]
+        password = postedData["password"]
+        money = postedData["amount"]
+
+        retJson,error = verifyCredentials(username,password)
+
+        if error:
+            return jsonify(retJson)
+        
+        cash=cashWithUser(username)
+        debt=cashWithUser(username)
+        updateAccount(username,cash+money)
+        updateDebt(username,debt+money)
+        
+        return jsonify(generateReturnDictionary(200, "Loan added to your account"))
+
+
+
+
+
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=True)
