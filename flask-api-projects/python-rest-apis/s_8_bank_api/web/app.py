@@ -201,16 +201,43 @@ class TakeLoan(Resource):
             return jsonify(retJson)
         
         cash=cashWithUser(username)
-        debt=cashWithUser(username)
+        debt=debtWithUser(username)
         updateAccount(username,cash+money)
         updateDebt(username,debt+money)
         
         return jsonify(generateReturnDictionary(200, "Loan added to your account"))
+    
 
+class PayLoan(Resource):
+    def post(self):
+        postedData=request.get_json()
 
+        username = postedData["username"]
+        password = postedData["password"]
+        money = postedData["amount"]
 
+        retJson,error = verifyCredentials(username,password)
 
+        if error:
+            return jsonify(retJson)
+        
+        cash=cashWithUser(username)
 
+        if cash<money:
+            return jsonify(generateReturnDictionary(303, "Not enough cash in your account"))
+        
+        debt=debtWithUser(username)
+        updateAccount(username,cash-money)
+        updateDebt(username,debt-money)
+
+        return jsonify(generateReturnDictionary(200, "You've successfully paid your loan"))
+    
+api.add_resource(Register,'/register')
+api.add_resource(Add,'/add')
+api.add_resource(Transfer,'/transfer')
+api.add_resource(Balance,'/balance')
+api.add_resource(TakeLoan,'/takeloan')
+api.add_resource(PayLoan,'/payloan')
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=True)
