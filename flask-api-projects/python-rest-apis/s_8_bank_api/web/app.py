@@ -13,7 +13,7 @@ db=client.BankAPI
 users = db["Users"]
 
 def UserExist(username):
-    if users.find({"Username":username}).count()==0:
+    if users.count_documents({"Username":username})==0:
         return False
     else:
         return True
@@ -113,7 +113,7 @@ class Add(Resource):
 
         username = postedData["username"]
         password = postedData["password"]
-        money = postedData["money"]
+        money = postedData["amount"]
 
         retJson,error = verifyCredentials(username,password)
 
@@ -130,7 +130,7 @@ class Add(Resource):
         # add the transaction fee to bank
         updateAccount("BANK",bank_cash+1)
         updateAccount(username,cash+money)
-        return jsonify(generateReturnDictionary(301,"Amount added successfully to account"))
+        return jsonify(generateReturnDictionary(200,"Amount added successfully to account"))
 
 class Transfer(Resource):
     def post(self):
@@ -139,7 +139,7 @@ class Transfer(Resource):
         username = postedData["username"]
         password = postedData["password"]
         to = postedData["to"]
-        money = postedData["money"]
+        money = postedData["amount"]
 
         retJson,error = verifyCredentials(username,password)
 
@@ -161,7 +161,7 @@ class Transfer(Resource):
         updateAccount("BANK",bank_cash+1)
         updateAccount(to,cash_to+money-1)
         # deduct money from user after transaction
-        updateAccount(username+cash_from-money)
+        updateAccount(username,cash_from-money)
 
         return jsonify(generateReturnDictionary(200, "Amount Transferred succesfully"))
     
